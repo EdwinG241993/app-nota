@@ -21,11 +21,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api', require('./routes/nota'));
+app.use('/api', require('./routes/users'));
+app.use('/api', require('./routes/login'));
 
 // Rutas
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
+
+// Usamos las rutas
+// app.use('/', indexRouter);
+// app.use('/users', usersRouter);
+app.use('/login', require('./routes/login'));
 
 // Middleware para Vue.js router modo history
 const history = require('connect-history-api-fallback');
