@@ -2,9 +2,10 @@ import express from 'express';
 const router = express.Router();
 
 // importar el modelo nota
+import User from "../models/user";
 import Nota from '../models/nota';
 
-const {verificarAuth, verificarAdministrador} = require('../middlewares/autenticacion')
+const { verificarAuth, verificaRol } = require('../middlewares/autenticacion')
 
 // Agregar una nota
 router.post('/nueva-nota', verificarAuth, async (req, res) => {
@@ -83,6 +84,37 @@ router.put('/nota/:id', async (req, res) => {
             mensaje: 'Ocurrio un error',
             error
         })
+    }
+});
+
+//RUTAS
+router.post("/nueva", verificarAuth, verificaRol, async (req, res) => {
+    let body = req.body;
+    console.log(req.usuario);
+    body.usuarioId = req.usuario._id;
+
+    try {
+        const tareaDB = await Nota.create(body);
+        return res.json(tareaDB);
+    } catch (error) {
+        return res.status(400).json({
+            mensaje: "Error al crear nota",
+            error
+        });
+    }
+});
+
+router.get("/", verificarAuth, async (req, res) => {
+    let usuarioId = req.usuario._id;
+
+    try {
+        const tareaDB = await Nota.find({ usuarioId });
+        return res.json(tareaDB);
+    } catch (error) {
+        return res.status(400).json({
+            mensaje: "Error al crear nota",
+            error
+        });
     }
 });
 

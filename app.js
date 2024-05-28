@@ -24,15 +24,19 @@ app.use('/api', require('./routes/nota'));
 app.use('/api', require('./routes/users'));
 app.use('/api', require('./routes/login'));
 
-// Rutas
+// Definición de las rutas
+const notaRoutes = require('./routes/nota');
+const usersRoutes = require('./routes/users');
+const loginRoutes = require('./routes/login');
+
+app.use('/api/nota', notaRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/login', loginRoutes);
+
+// Ruta raíz
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
-
-// Usamos las rutas
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
-app.use('/login', require('./routes/login'));
 
 // Middleware para Vue.js router modo history
 const history = require('connect-history-api-fallback');
