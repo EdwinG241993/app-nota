@@ -44,7 +44,22 @@ router.post('/nuevo-usuario', [verificarAuth, verificaRol], async (req, res) => 
 
 /* GET users listing. */
 router.get('/usuario', verificarAuth, async (req, res) => {
-    res.send('respond with a resource');
+    const usuarioId = req.usuario._id;
+    console.log(usuarioId);
+    try {
+        const usuario = await User.findById(usuarioId, '-password'); // Excluye el campo de la contraseña
+        if (!usuario) {
+            return res.status(404).json({
+                mensaje: 'Usuario no encontrado'
+            });
+        }
+        res.status(200).json({ user: usuario });
+    } catch (error) {
+        res.status(500).json({
+            mensaje: 'Ocurrió un error',
+            error
+        });
+    }
 });
 
 router.put('/usuario/:id', [verificarAuth, verificaRol], async (req, res) => {

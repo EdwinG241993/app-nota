@@ -8,10 +8,17 @@ import Nota from '../models/nota';
 const { verificarAuth, verificaRol } = require('../middlewares/autenticacion')
 
 // Agregar una nota
-router.post('/nueva-nota', verificarAuth, async (req, res) => {
+router.post('/nueva-nota', verificarAuth, verificaRol, async (req, res) => {
     const body = req.body;
+    const usuarioId = req.usuario._id; // Obtener el ID del usuario autenticado
+
+    // Agregar el usuarioId al body
+    const nuevaNota = {
+        ...body,
+        usuarioId: usuarioId
+    };
     try {
-        const notaDB = await Nota.create(body);
+        const notaDB = await Nota.create(nuevaNota);
         res.status(200).json(notaDB);
     } catch (error) {
         return res.status(500).json({
@@ -37,9 +44,16 @@ router.get('/nota/:id', async (req, res) => {
 
 // Get con todos los documentos
 router.get('/nota', verificarAuth, async (req, res) => {
+    const usuarioId = req.usuario._id;
+
+    const queryLimit = Number(req.query.limit) || 5;
+    const querySkip = Number(req.query.skip) || 0;
+
     try {
-        const notaDb = await Nota.find();
-        res.json(notaDb);
+        const notaDB = await Nota.find({ usuarioId }).skip(querySkip).limit(queryLimit);
+        const totalNotas = await Nota.find({ usuarioId }).countDocuments();
+
+        res.json({ notaDB, totalNotas });
     } catch (error) {
         return res.status(400).json({
             mensaje: 'Ocurrio un error',
